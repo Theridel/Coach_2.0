@@ -1,0 +1,123 @@
+:root {
+    --primary-color: #0056b3; /* Blu scuro per evidenza */
+    --secondary-color: #e9ecef; /* Sfondo per le card */
+    --background-light: #f8f9fa;
+    --text-dark: #343a40;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-light);
+    color: var(--text-dark);
+}
+
+.container {
+    width: 95%; 
+    max-width: 800px;
+    margin: 20px auto; 
+    padding: 0;
+}
+
+header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    color: var(--text-dark);
+    margin-top: 0;
+}
+
+header h1, header p {
+    color: white;
+}
+
+/* Griglia per i link (Launchpad Cards) */
+.grid {
+    display: flex;
+    flex-direction: column; /* I link uno sotto l'altro su mobile (priorità) */
+    align-items: center; 
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Link Card */
+.link-card {
+    display: block;
+    padding: 18px 25px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--primary-color);
+    background-color: var(--secondary-color);
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    text-align: center; /* Centra il testo all'interno della card */
+    width: 100%;
+    max-width: 400px;
+}
+
+.link-card:hover {
+    background-color: #dee2e6;
+    border-color: var(--primary-color);
+    transform: translateY(-2px); 
+}
+
+/* Media Query: Adattamento per schermi più grandi (Tablet/Desktop) */
+@media (min-width: 600px) {
+    .container {
+        margin-top: 40px;
+        width: 90%;
+    }
+    
+    .grid {
+        /* Passaggio a layout a griglia/colonne per schermi più grandi */
+        flex-direction: row; 
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .link-card {
+        flex-basis: calc(50% - 7.5px); /* Due colonne */
+    }
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9em;
+    color: var(--text-dark);
+    border-top: 1px solid #dee2e6;
+    padding-left: 10px; /* ✅ aggiunto */
+    padding-right: 10px; /* ✅ aggiunto */
+}
+
+/* Layout pulsanti Launchpad */
+.container-pulsanti {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* due colonne */
+  gap: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.container-pulsanti button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+}
+
+/* Responsive: su schermi piccoli torna a una colonna */
+@media (max-width: 600px) {
+  .container-pulsanti {
+    grid-template-columns: 1fr; /* una colonna */
+  }
+}
