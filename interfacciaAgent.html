@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theridel Coach</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Theridel Coach Ver 0.4-Supabase</h1>
+        <p>Benvenuto nella piattaforma di coaching, accedi per gestire il tuo percorso.</p>
+    </header>
+
+    <main>
+        <button onclick="location.href='adeguamentoContesto.html'">Accedi alla modifica del contesto</button>
+        <button onclick="location.href='sviluppoSistema.html'">Accedi al Progetto Sviluppo Sistema</button>
+        
+        <section id="aiDirectives">
+            <h2>Direttive AI</h2>
+            <div id="dynamic-directives-container">
+                <p>Caricamento direttive dal database...</p>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { db, openDatabase } from './assets/js/indexedDB.js';
+
+        // --- CONFIGURAZIONE SUPABASE ---
+        // TODO: In futuro queste chiavi andranno nel file .env e gestite tramite Secret di Colab/Vercel
+        const SUPABASE_URL = 'https://wrywcnpbdpdcribpirkr.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyeXdjbnBiZHBkY3JpYnBpcmtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzkxODksImV4cCI6MjA4MTgxNTE4OX0.4Uu0EPIfnkBh9DaAR-SOrOwwxjTefN-GSxx8icCnENU';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Funzione per caricare tutte le direttive presenti nella tabella
+        async function loadAllDirectives() {
+            const container = document.getElementById('dynamic-directives-container');
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('direttive_ai')
+                    .select('*')
+                    .order('id', { ascending: true });
+
+                if (error) throw error;
+
+                container.innerHTML = ''; // Pulizia caricamento
+
+                data.forEach(item => {
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.className = 'directive-block';
+                    sectionDiv.style.marginBottom = '20px';
+                    
+                    sectionDiv.innerHTML = `
+                        <h3>${item.sezione}</h3>
+                        <textarea id="text-${item.id}" style="width:100%; min-height:100px;">${item.contenuto}</textarea>
+                        <button onclick="updateDirective(${item.id})">Salva ${item.sezione}</button>
+                    `;
+                    container.appendChild(sectionDiv);
+                });
+
+            } catch (err) {
+                console.error('Errore Supabase:', err.message);
+                container.innerHTML = '<p style="color:red;">Errore nel caricamento dal database cloud.</p>';
+            }
+        }
+
+        // Funzione per aggiornare una specifica riga
+        window.updateDirective = async function(id) {
+            const nuovoContenuto = document.getElementById(`text-${id}`).value;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('direttive_ai')
+                    .update({ 
+                        contenuto: nuovoContenuto,
+                        ultima_modifica: new Date().toISOString() 
+                    })
+                    .eq('id', id);
+
+                if (error) throw error;
+                alert('Aggiornamento completato con successo!');
+            } catch (err) {
+                console.error('Errore durante il salvataggio:', err.message);
+                alert('Errore nel salvataggio.');
+            }
+        };
+
+        // Avvio al caricamento della pagina
+        window.onload = function() {
+            loadAllDirectives();
+            // Mantengo il log per IndexedDB come nel tuo file originale
+            console.log("Sistema pronto. Verificando IndexedDB...");
+        };
+    </script>
+</body>
+</html>
