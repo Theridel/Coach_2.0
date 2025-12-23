@@ -52,31 +52,78 @@
     </footer>
     
 <script type="module">
+    // --- SISTEMA SICURO COACH 2.0 ---
+    // Non inizializziamo più il client Supabase qui per proteggere le chiavi.
+    // Usiamo le Serverless Functions in /api/ che leggono le chiavi da Vercel.
+
     async function loadAllDirectives() {
         const container = document.getElementById('dynamic-directives-container');
         try {
-            // Chiamiamo la nostra funzione serverless invece di Supabase
+            // Chiamata alla tua API sicura su Vercel
             const response = await fetch('/api/get-directives');
-            if (!response.ok) throw new Error('Errore nel recupero dati');
-            const data = await response.json();
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Errore nel caricamento');
+            }
 
+            const data = await response.json();
             container.innerHTML = ''; 
+
             data.forEach(item => {
                 const sectionDiv = document.createElement('div');
                 sectionDiv.className = 'directive-block';
+                sectionDiv.style.border = '1px solid #ccc';
+                sectionDiv.style.padding = '15px';
+                sectionDiv.style.marginBottom = '20px';
+                
                 sectionDiv.innerHTML = `
                     <h3>${item.sezione}</h3>
                     <textarea id="text-${item.id}" style="width:100%; min-height:100px;">${item.contenuto}</textarea>
-                    <button onclick="updateDirective(${item.id})">Salva ${item.sezione}</button>
+                    <br>
+                    <button id="btn-${item.id}">Salva Modifiche</button>
                 `;
                 container.appendChild(sectionDiv);
+
+                // Colleghiamo l'evento al pulsante
+                document.getElementById(`btn-${item.id}`).addEventListener('click', () => updateDirective(item.id));
             });
+
         } catch (err) {
-            container.innerHTML = `<p style="color:red;">Errore: ${err.message}</p>`;
+            console.error('Errore:', err.message);
+            container.innerHTML = `<p style="color:red;">Errore di connessione: ${err.message}</p>`;
         }
     }
 
-    // Avvio automatico
+    async function updateDirective(id) {
+        const nuovoContenuto = document.getElementById(`text-${id}`).value;
+        const btn = document.getElementById(`btn-${id}`);
+        btn.disabled = true;
+        btn.innerText = 'Salvataggio...';
+
+        try {
+            // Chiamata all'API di salvataggio sicura
+            const response = await fetch('/api/update-directive', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, contenuto: nuovoContenuto })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Errore nel salvataggio');
+            }
+
+            alert('Database aggiornato con successo tramite API sicura!');
+        } catch (err) {
+            alert('Errore nel salvataggio: ' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Salva Modifiche';
+        }
+    }
+
+    // Avvio automatico al caricamento della pagina
     document.addEventListener('DOMContentLoaded', loadAllDirectives);
 </script>
 
