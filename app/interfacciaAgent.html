@@ -3,48 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theridel Coach 2.0</title>
-    <link rel="stylesheet" href="app/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Theridel Coach 2.0 - Interfaccia Agent</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
         <h1>Theridel Coach Ver 2.0</h1>
-        <p>Versione pulita con integrazione Supabase e protezione chiavi.</p>
+        <p>Interfaccia sicura: le chiavi sono gestite da Vercel.</p>
     </header>
 
     <main>
-        <button onclick="location.href='adeguamentoContesto.html'">Modifica Contesto</button>
-        <button onclick="location.href='sviluppoSistema.html'">Sviluppo Sistema</button>
+        <button onclick="location.href='index.html'">Torna alla Home</button>
         
         <section id="aiDirectives">
-            <h2>Direttive AI (Tabella Unica)</h2>
+            <h2>Direttive AI (Gestione Sicura)</h2>
             <div id="dynamic-directives-container">
-                <p>Caricamento in corso...</p>
+                <p>Caricamento in corso dalle API di Vercel...</p>
             </div>
         </section>
     </main>
 
     <script type="module">
-        // --- CONFIGURAZIONE SICURA (Promemoria Progetto) ---
-        // Quando sei su Vercel, queste chiavi vengono lette dalle "Environment Variables".
-        // Per il test locale/Colab, assicurati che siano corrette.
-        //const SUPABASE_URL = 'https://wrywcnpbdpdcribpirkr.supabase.co';
-        //const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyeXdjbnBiZHBkY3JpYnBpcmtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzkxODksImV4cCI6MjA4MTgxNTE4OX0.4Uu0EPIfnkBh9DaAR-SOrOwwxjTefN-GSxx8icCnENU'; 
-
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+        // --- LOGICA DI COMUNICAZIONE SICURA ---
+        // Non usiamo più supabase-js direttamente nel browser per non esporre le chiavi.
+        // Interroghiamo invece le Serverless Functions in /api/.
 
         async function loadAllDirectives() {
             const container = document.getElementById('dynamic-directives-container');
             try {
-                const { data, error } = await supabaseClient
-                    .from('direttive_ai') // La tua tabella unica
-                    .select('*')
-                    .order('id', { ascending: true });
+                // Chiamata alla funzione Node.js creata in app/api/get-directives.js
+                const response = await fetch('/api/get-directives');
+                
+                if (!response.ok) throw new Error('Impossibile recuperare i dati dalle API');
 
-                if (error) throw error;
-
+                const data = await response.json();
                 container.innerHTML = ''; 
 
                 data.forEach(item => {
@@ -62,7 +54,7 @@
                     `;
                     container.appendChild(sectionDiv);
 
-                    // Colleghiamo l'evento al pulsante appena creato
+                    // Colleghiamo l'evento al pulsante usando la nuova logica fetch
                     document.getElementById(`btn-${item.id}`).addEventListener('click', () => updateDirective(item.id));
                 });
 
@@ -76,19 +68,19 @@
             const nuovoContenuto = document.getElementById(`text-${id}`).value;
             const btn = document.getElementById(`btn-${id}`);
             btn.disabled = true;
-            btn.innerText = 'Salvataggio...';
+            btn.innerText = 'Salvataggio in corso...';
 
             try {
-                const { error } = await supabaseClient
-                    .from('direttive_ai')
-                    .update({ 
-                        contenuto: nuovoContenuto,
-                        ultima_modifica: new Date().toISOString() 
-                    })
-                    .eq('id', id);
+                // Chiamata alla funzione Node.js in app/api/update-directive.js
+                const response = await fetch('/api/update-directive', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, contenuto: nuovoContenuto })
+                });
 
-                if (error) throw error;
-                alert('Database aggiornato con successo!');
+                if (!response.ok) throw new Error('Errore durante il salvataggio');
+
+                alert('Database aggiornato con successo (via API Vercel)!');
             } catch (err) {
                 alert('Errore nel salvataggio: ' + err.message);
             } finally {
@@ -97,7 +89,7 @@
             }
         }
 
-        // Avvio automatico
+        // Avvio automatico al caricamento della pagina
         document.addEventListener('DOMContentLoaded', loadAllDirectives);
     </script>
 </body>
