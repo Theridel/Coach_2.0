@@ -1,18 +1,23 @@
 /**
- * api/get-directives.js - Gestione del Backend
- * Questo codice gira sui server di Vercel, non nel browser.
+ * api/get-directives.js
+ * TEST SEMPLICE SENZA SUPABASE
  */
-
 export default function handler(req, res) {
-    // Per ora restituiamo dati "finti" (Mock) per testare il collegamento.
-    // In futuro, qui inseriremo la chiamata a Supabase.
-    const datiDiEsempio = [
-        { 
-            id: 1, 
-            sezione: "Test Vercel", 
-            contenuto: "Se vedi questo, il ponte tra scripts/main.js e api/get-directives.js funziona!" 
-        }
-    ];
+    try {
+        // Creiamo un dato di test statico
+        const datiTest = [
+            { 
+                id: 1, 
+                sezione: "Connessione API", 
+                contenuto: "Sincronizzazione completata! Il backend Vercel risponde correttamente." 
+            }
+        ];
 
-    // Rispondiamo al browser con lo stato 200 (OK) e i dati in formato JSON
-    res.status(200).json(datiDiEsempio);
+        // Inviamo la risposta al frontend
+        res.status(200).json(datiTest);
+        
+    } catch (error) {
+        // Se c'è un errore di codice, lo inviamo al frontend per leggerlo
+        res.status(500).json({ error: error.message });
+    }
+}
