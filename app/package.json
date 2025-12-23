@@ -1,5 +1,15 @@
 {
+  "name": "mio-progetto-supabase-vercel",
+  "version": "1.0.0",
+  "description": "App Full-Stack con Vercel e Supabase",
+  "main": "index.html",
+  "scripts": {
+    "start": "servor --reload"
+  },
   "dependencies": {
-    "@supabase/supabase-js": "^2.0.0"
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
