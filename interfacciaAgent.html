@@ -1,101 +1,83 @@
-<!DOCTYPE html>
-<html lang="it">
+<script type="module">
+    // --- PROTEZIONE CHIAVI (Promemoria Progetto) ---
+    // Queste chiavi sono inserite qui solo per test immediato. 
+    // TODO: Prima del deploy su Vercel, rimuoverle e usare process.env.NEXT_PUBLIC_...
+    // Ricordati di inserirle nei "Secrets" di Colab con i nomi corrispondenti.
+    
+    const SUPABASE_URL = 'https://wrywcnpbdpdcribpirkr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyeXdjbnBiZHBkY3JpYnBpcmtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzkxODksImV4cCI6MjA4MTgxNTE4OX0.4Uu0EPIfnkBh9DaAR-SOrOwwxjTefN-GSxx8icCnENU'; // Recuperala dai Secrets di Colab
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theridel Coach</title>
-     <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
+    // Inizializzazione corretta
+    const { createClient } = supabase;
+    const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-<body>
-    <header>
-        <h1>Theridel Coach Ver 0.4-Supabase</h1>
-        <p>Benvenuto nella piattaforma di coaching, accedi per gestire il tuo percorso.</p>
-    </header>
-
-    <main>
-        <button onclick="location.href='adeguamentoContesto.html'">Accedi alla modifica del contesto</button>
-        <button onclick="location.href='sviluppoSistema.html'">Accedi al Progetto Sviluppo Sistema</button>
+    async function loadAllDirectives() {
+        const container = document.getElementById('dynamic-directives-container');
         
-        <section id="aiDirectives">
-            <h2>Direttive AI</h2>
-            <div id="dynamic-directives-container">
-                <p>Caricamento direttive dal database...</p>
-            </div>
-        </section>
-    </main>
+        try {
+            // Unificazione tabelle: puntiamo alla tabella unica che abbiamo deciso di tenere
+            const { data, error } = await _supabase
+                .from('direttive_ai') // Assicurati che il nome sia corretto su Supabase
+                .select('*')
+                .order('id', { ascending: true });
 
-    <script type="module">
-        import { db, openDatabase } from './assets/js/indexedDB.js';
-
-        // --- CONFIGURAZIONE SUPABASE ---
-        // TODO: In futuro queste chiavi andranno nel file .env e gestite tramite Secret di Colab/Vercel
-        const SUPABASE_URL = 'https://wrywcnpbdpdcribpirkr.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyeXdjbnBiZHBkY3JpYnBpcmtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzkxODksImV4cCI6MjA4MTgxNTE4OX0.4Uu0EPIfnkBh9DaAR-SOrOwwxjTefN-GSxx8icCnENU';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Funzione per caricare tutte le direttive presenti nella tabella
-        async function loadAllDirectives() {
-            const container = document.getElementById('dynamic-directives-container');
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('direttive_ai')
-                    .select('*')
-                    .order('id', { ascending: true });
-
-                if (error) throw error;
-
-                container.innerHTML = ''; // Pulizia caricamento
-
-                data.forEach(item => {
-                    const sectionDiv = document.createElement('div');
-                    sectionDiv.className = 'directive-block';
-                    sectionDiv.style.marginBottom = '20px';
-                    
-                    sectionDiv.innerHTML = `
-                        <h3>${item.sezione}</h3>
-                        <textarea id="text-${item.id}" style="width:100%; min-height:100px;">${item.contenuto}</textarea>
-                        <button onclick="updateDirective(${item.id})">Salva ${item.sezione}</button>
-                    `;
-                    container.appendChild(sectionDiv);
-                });
-
-            } catch (err) {
-                console.error('Errore Supabase:', err.message);
-                container.innerHTML = '<p style="color:red;">Errore nel caricamento dal database cloud.</p>';
+            if (error) throw error;
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p>Nessuna direttiva trovata. Verifica la tabella su Supabase.</p>';
+                return;
             }
+
+            container.innerHTML = ''; 
+
+            data.forEach(item => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'directive-block';
+                sectionDiv.style.marginBottom = '20px';
+                
+                // Usiamo l'ID univoco di Supabase per legare textarea e bottone
+                sectionDiv.innerHTML = `
+                    <h3>${item.sezione}</h3>
+                    <textarea id="text-${item.id}" style="width:100%; min-height:100px;">${item.contenuto}</textarea>
+                    <button id="btn-${item.id}">Salva ${item.sezione}</button>
+                `;
+                container.appendChild(sectionDiv);
+
+                // Event listener moderno invece di onclick nell'HTML (più sicuro e compatibile con i moduli)
+                document.getElementById(`btn-${item.id}`).addEventListener('click', () => updateDirective(item.id));
+            });
+
+        } catch (err) {
+            console.error('Errore Supabase:', err.message);
+            container.innerHTML = `<p style="color:red;">Errore: ${err.message}</p>`;
         }
+    }
 
-        // Funzione per aggiornare una specifica riga
-        window.updateDirective = async function(id) {
-            const nuovoContenuto = document.getElementById(`text-${id}`).value;
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('direttive_ai')
-                    .update({ 
-                        contenuto: nuovoContenuto,
-                        ultima_modifica: new Date().toISOString() 
-                    })
-                    .eq('id', id);
+    async function updateDirective(id) {
+        const nuovoContenuto = document.getElementById(`text-${id}`).value;
+        const btn = document.getElementById(`btn-${id}`);
+        
+        btn.disabled = true;
+        btn.innerText = 'Salvataggio...';
 
-                if (error) throw error;
-                alert('Aggiornamento completato con successo!');
-            } catch (err) {
-                console.error('Errore durante il salvataggio:', err.message);
-                alert('Errore nel salvataggio.');
-            }
-        };
+        try {
+            const { error } = await _supabase
+                .from('direttive_ai')
+                .update({ 
+                    contenuto: nuovoContenuto,
+                    ultima_modifica: new Date().toISOString() 
+                })
+                .eq('id', id);
 
-        // Avvio al caricamento della pagina
-        window.onload = function() {
-            loadAllDirectives();
-            // Mantengo il log per IndexedDB come nel tuo file originale
-            console.log("Sistema pronto. Verificando IndexedDB...");
-        };
-    </script>
-</body>
-</html>
+            if (error) throw error;
+            alert('Aggiornamento completato!');
+        } catch (err) {
+            alert('Errore: ' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = `Salva`;
+        }
+    }
+
+    // Avvio al caricamento
+    document.addEventListener('DOMContentLoaded', loadAllDirectives);
+</script>
