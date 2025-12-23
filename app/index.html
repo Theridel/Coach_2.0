@@ -51,5 +51,34 @@
         <p>Semplice, Responsive. Modifica i link direttamente in index.html.</p>
     </footer>
     
+<script type="module">
+    async function loadAllDirectives() {
+        const container = document.getElementById('dynamic-directives-container');
+        try {
+            // Chiamiamo la nostra funzione serverless invece di Supabase
+            const response = await fetch('/api/get-directives');
+            if (!response.ok) throw new Error('Errore nel recupero dati');
+            const data = await response.json();
+
+            container.innerHTML = ''; 
+            data.forEach(item => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'directive-block';
+                sectionDiv.innerHTML = `
+                    <h3>${item.sezione}</h3>
+                    <textarea id="text-${item.id}" style="width:100%; min-height:100px;">${item.contenuto}</textarea>
+                    <button onclick="updateDirective(${item.id})">Salva ${item.sezione}</button>
+                `;
+                container.appendChild(sectionDiv);
+            });
+        } catch (err) {
+            container.innerHTML = `<p style="color:red;">Errore: ${err.message}</p>`;
+        }
+    }
+
+    // Avvio automatico
+    document.addEventListener('DOMContentLoaded', loadAllDirectives);
+</script>
+
 </body>
 </html>
