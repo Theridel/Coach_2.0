@@ -21,26 +21,13 @@
                 <p>Caricamento in corso dalle API di Vercel...</p>
             </div>
         </section>
-
-        <section id="directives-section">
-            <h2>Direttive Dinamiche</h2>
-            <div id="dynamic-directives-container">
-                <p>In attesa di configurazione API...</p>
-            </div>
-        </section>
     </main>
 
     <script type="module">
-        // --- LOGICA DI COMUNICAZIONE SICURA ---
-        // Non usiamo più supabase-js direttamente nel browser per non esporre le chiavi.
-        // Interroghiamo invece le Serverless Functions in /api/.
-
         async function loadAllDirectives() {
             const container = document.getElementById('dynamic-directives-container');
             try {
-                // Chiamata alla funzione Node.js creata in app/api/get-directives.js
                 const response = await fetch('/api/get-directives');
-                
                 if (!response.ok) throw new Error('Impossibile recuperare i dati dalle API');
 
                 const data = await response.json();
@@ -61,10 +48,8 @@
                     `;
                     container.appendChild(sectionDiv);
 
-                    // Colleghiamo l'evento al pulsante usando la nuova logica fetch
                     document.getElementById(`btn-${item.id}`).addEventListener('click', () => updateDirective(item.id));
                 });
-
             } catch (err) {
                 console.error('Errore:', err.message);
                 container.innerHTML = `<p style="color:red;">Errore di connessione: ${err.message}</p>`;
@@ -78,7 +63,6 @@
             btn.innerText = 'Salvataggio in corso...';
 
             try {
-                // Chiamata alla funzione Node.js in app/api/update-directive.js
                 const response = await fetch('/api/update-directive', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -86,8 +70,7 @@
                 });
 
                 if (!response.ok) throw new Error('Errore durante il salvataggio');
-
-                alert('Database aggiornato con successo (via API Vercel)!');
+                alert('Database aggiornato con successo!');
             } catch (err) {
                 alert('Errore nel salvataggio: ' + err.message);
             } finally {
@@ -95,8 +78,7 @@
                 btn.innerText = 'Salva Modifiche';
             }
         }
-        <script src="scripts/main.js" type="module"></script>
-        // Avvio automatico al caricamento della pagina
+
         document.addEventListener('DOMContentLoaded', loadAllDirectives);
     </script>
 </body>
