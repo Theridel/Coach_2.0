@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   try {
     // Sostituisci 'NOME_TABELLA' con il nome reale della tua tabella
     const { data, error } = await supabase
-      .from('NOME_TABELLA') 
+      .from('direttive_ai') 
       .select('*');
 
     if (error) throw error;
