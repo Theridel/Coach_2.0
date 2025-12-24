@@ -1,19 +1,25 @@
+// QUESTA RIGA È FONDAMENTALE:
+import { createClient } from '@supabase/supabase-js';
+
 export default async function handler(req, res) {
-  // Vercel recupera queste variabili dai "Secret" che hai appena visto (oscurati)
+  // Controlliamo che le chiavi esistano (per evitare crash muti)
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+    return res.status(500).json({ error: "Chiavi mancanti su Vercel" });
+  }
+
   const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_ANON_KEY
   );
 
   try {
-    // Sostituisci 'NOME_TABELLA' con il nome reale della tua tabella
     const { data, error } = await supabase
       .from('direttive_ai') 
-      .select('*');
+      .select('*')
+      .order('id', { ascending: true }); // Mantiene l'ordine visto nello screenshot
 
     if (error) throw error;
 
-    // Restituiamo i dati al frontend
     return res.status(200).json(data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
