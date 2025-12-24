@@ -1,23 +1,21 @@
-/**
- * api/get-directives.js
- * TEST SEMPLICE SENZA SUPABASE
- */
-export default function handler(req, res) {
-    try {
-        // Creiamo un dato di test statico
-        const datiTest = [
-            { 
-                id: 1, 
-                sezione: "Connessione API", 
-                contenuto: "Sincronizzazione completata! Il backend Vercel risponde correttamente." 
-            }
-        ];
+export default async function handler(req, res) {
+  // Vercel recupera queste variabili dai "Secret" che hai appena visto (oscurati)
+  const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY
+  );
 
-        // Inviamo la risposta al frontend
-        res.status(200).json(datiTest);
-        
-    } catch (error) {
-        // Se c'è un errore di codice, lo inviamo al frontend per leggerlo
-        res.status(500).json({ error: error.message });
-    }
+  try {
+    // Sostituisci 'NOME_TABELLA' con il nome reale della tua tabella
+    const { data, error } = await supabase
+      .from('NOME_TABELLA') 
+      .select('*');
+
+    if (error) throw error;
+
+    // Restituiamo i dati al frontend
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 }
