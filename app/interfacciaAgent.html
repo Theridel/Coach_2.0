@@ -64,7 +64,7 @@
             btn.innerText = 'Salvataggio in corso...';
 
             try {
-                const response = await fetch('/api/update-directive', {
+                const response = await fetch('/api/update-directives', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id, contenuto: nuovoContenuto })
