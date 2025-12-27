@@ -3,7 +3,7 @@
  * Questo script viene eseguito nel browser dell'utente.
  */
 
-<script type="module">
+
         async function loadAllDirectives() {
             const container = document.getElementById('dynamic-directives-container');
             try {
@@ -60,4 +60,4 @@
         }
 
         document.addEventListener('DOMContentLoaded', loadAllDirectives);
-    </script>
+   
