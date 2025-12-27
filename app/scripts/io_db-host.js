@@ -3,52 +3,61 @@
  * Questo script viene eseguito nel browser dell'utente.
  */
 
-async function caricaDatiDalBackend() {
-    // Tenta di trovare il contenitore dove scrivere i dati
-    const contenitore = document.getElementById('dynamic-directives-container');
+<script type="module">
+        async function loadAllDirectives() {
+            const container = document.getElementById('dynamic-directives-container');
+            try {
+                const response = await fetch('/api/get-directives');
+                if (!response.ok) throw new Error('Impossibile recuperare i dati dalle API');
 
-    try {
-        // 1. Chiamata all'API interna di Vercel (il "ponte")
-        // Non usiamo URL completi, basta il percorso relativo
-        const risposta = await fetch('/api/get-directives');
+                const data = await response.json();
+                container.innerHTML = ''; 
 
-        // Controlliamo se il server ha risposto con un errore (es. 404 o 500)
-        if (!risposta.ok) {
-            throw new Error('Il server ha risposto con un errore');
+                data.forEach(item => {
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.className = 'directive-block';
+                    sectionDiv.style.border = '1px solid #ccc';
+                    sectionDiv.style.padding = '15px';
+                    sectionDiv.style.marginBottom = '20px';
+                    
+                    sectionDiv.innerHTML = `
+                        <h3>${item.sezione}</h3>
+                        <textarea id="text-${item.id}" style="width:100%; min-height:100px;">${item.contenuto}</textarea>
+                        <br>
+                        <button id="btn-${item.id}">Salva Modifiche</button>
+                    `;
+                    container.appendChild(sectionDiv);
+
+                    document.getElementById(`btn-${item.id}`).addEventListener('click', () => updateDirective(item.id));
+                });
+            } catch (err) {
+                console.error('Errore:', err.message);
+                container.innerHTML = `<p style="color:red;">Errore di connessione: ${err.message}</p>`;
+            }
         }
 
-        // 2. Trasformiamo la risposta in dati leggibili (JSON)
-        const dati = await risposta.json();
+        async function updateDirective(id) {
+            const nuovoContenuto = document.getElementById(`text-${id}`).value;
+            const btn = document.getElementById(`btn-${id}`);
+            btn.disabled = true;
+            btn.innerText = 'Salvataggio in corso...';
 
-        // 3. Puliamo il contenitore (rimuove il testo "In attesa...")
-        contenitore.innerHTML = '';
+            try {
+                const response = await fetch('/api/update-directives', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, contenuto: nuovoContenuto })
+                });
 
-        // 4. Cicliamo sui dati ricevuti per creare i blocchi visibili
-        dati.forEach(elemento => {
-            const divDinamico = document.createElement('div');
-            
-            // Applichiamo uno stile rapido per il test
-            divDinamico.style.border = '1px solid #2196f3';
-            divDinamico.style.padding = '15px';
-            divDinamico.style.marginTop = '10px';
-            divDinamico.style.borderRadius = '8px';
+                if (!response.ok) throw new Error('Errore durante il salvataggio');
+                alert('Database aggiornato con successo!');
+            } catch (err) {
+                alert('Errore nel salvataggio: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Salva Modifiche';
+            }
+        }
 
-            // Inseriamo il titolo della sezione e il testo
-            divDinamico.innerHTML = `
-                <h3>${elemento.sezione}</h3>
-                <p>${elemento.contenuto}</p>
-            `;
-
-            // Aggiungiamo il blocco appena creato nella pagina
-            contenitore.appendChild(divDinamico);
-        });
-
-    } catch (errore) {
-        // Se qualcosa va storto (es. internet assente o errore server)
-        console.error('Errore rilevato:', errore);
-        contenitore.innerHTML = `<p style="color:red;">Errore: ${errore.message}</p>`;
-    }
-}
-
-// Avviamo la funzione solo quando tutta la pagina HTML è stata caricata
-document.addEventListener('DOMContentLoaded', caricaDatiDalBackend);
+        document.addEventListener('DOMContentLoaded', loadAllDirectives);
+    </script>
