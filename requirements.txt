@@ -1,0 +1,10 @@
+# COMUNICAZIONE DATABASE
+supabase>=2.3.7
+
+# CONFIGURAZIONE E SICUREZZA
+python-dotenv
+
+# VALIDAZIONE E ANALISI DATI
+pydantic>=2.0.0
+pandas>=2.1.0
+python-dateutil
