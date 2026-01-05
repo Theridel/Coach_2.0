@@ -1,10 +1,27 @@
+# ==========================================================
+# REQUISITI CORE (Vercel / Base Progetto)
+# ==========================================================
+
 # COMUNICAZIONE DATABASE
+# Il client ufficiale per interagire con Supabase. 
+# Fondamentale per leggere/scrivere i dati che mostri sul sito.
 supabase>=2.3.7
 
+# VALIDAZIONE DATI
+# Pydantic v2 è essenziale per definire la struttura dei dati.
+# Aiuta a evitare errori quando ricevi dati "sporchi" dal database o dall'AI.
+pydantic>=2.0.0
+
+# ORM & MEMORIA
+# SQLAlchemy serve per gestire database relazionali. 
+# Utile se in futuro vorrai sincronizzare dati locali con quelli remoti.
+SQLAlchemy
+
 # CONFIGURAZIONE E SICUREZZA
+# Serve per caricare le chiavi (URL e ANON_KEY) dal file .env in locale.
+# Su Vercel e Colab Secrets, le chiavi vengono lette direttamente dall'ambiente.
 python-dotenv
 
-# VALIDAZIONE E ANALISI DATI
-pydantic>=2.0.0
+# ANALISI DATI BASE
+# Pandas è utile per formattare i dati prima di inviarli al frontend o all'agente.
 pandas>=2.1.0
-python-dateutil
