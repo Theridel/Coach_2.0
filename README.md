@@ -3,3 +3,14 @@
 
 Imparerò dagli errori e sarà durissima, e sto già pensando ad una nuova versione...
 La cosa più importamte sarà non perdersi.
+
+# Personal-AI-Agent-for-coach
+Progetto per Agent AI usando Gemma su colab
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Theridel/Coach_2.0/blob/main/Launcher_AI.ipynb)
+
+
+## 🎯 Obiettivo
+
+Costruire un **Agent AI modulare** e **riproducibile** che:
+
+# La parte sottostante è da verificare
