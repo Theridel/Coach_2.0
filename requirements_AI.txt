@@ -18,7 +18,7 @@ langchain
 
 # CALCOLO MATEMATICO & VETTORIALE
 # Fondamentale per la gestione degli embeddings (la memoria semantica dell'AI).
-numpy>=1.24.0
+numpy>=1.26.0
 
 # SUPPORTO DATE (Consigliato per Supabase)
 # Spesso necessario per gestire correttamente i timestamp di Supabase in Python.
