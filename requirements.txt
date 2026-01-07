@@ -24,4 +24,4 @@ python-dotenv
 
 # ANALISI DATI BASE
 # Pandas è utile per formattare i dati prima di inviarli al frontend o all'agente.
-pandas>=2.2.0
+pandas>=2.2.0,<2.3.0
