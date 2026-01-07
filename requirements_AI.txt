@@ -5,12 +5,12 @@
 # ESECUZIONE MODELLI LOCALI
 # Permette di far girare i modelli GGUF (Llama, Mistral) direttamente
 # sulla CPU/GPU di SageMaker o Colab senza passare per API esterne.
-llama-cpp-python>=0.2.0
+llama-cpp-python>=0.2.0,<1.0.0
 
 # ORCHESTRAZIONE AGENTI
 # Collega il tuo database Supabase (già configurato nel Core) 
 # alla logica di ragionamento dell'agente.
-langchain>=0.1.0
+langchain>=0.1.0,<1,0,0
 
 # --- Framework Alternativi (Opzionali) ---
 # crewai      # Per coordinare più agenti specializzati.
@@ -18,8 +18,8 @@ langchain>=0.1.0
 
 # CALCOLO MATEMATICO & VETTORIALE
 # Fondamentale per la gestione degli embeddings (la memoria semantica dell'AI).
-numpy>=1.26.4,<2.3.0
+numpy>=1.26.4,<2.2.0
 
 # SUPPORTO DATE (Consigliato per Supabase)
 # Spesso necessario per gestire correttamente i timestamp di Supabase in Python.
-python-dateutil>=2.0.0
+python-dateutil>=2.0.0,<3.0.0
