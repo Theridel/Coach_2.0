@@ -10,7 +10,7 @@ llama-cpp-python>=0.2.0,<1.0.0
 # ORCHESTRAZIONE AGENTI
 # Collega il tuo database Supabase (già configurato nel Core) 
 # alla logica di ragionamento dell'agente.
-langchain>=0.1.0,<1,0,0
+langchain>=0.1.0,<1.0.0
 
 # --- Framework Alternativi (Opzionali) ---
 # crewai      # Per coordinare più agenti specializzati.
