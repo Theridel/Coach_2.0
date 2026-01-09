@@ -10,7 +10,7 @@ llama-cpp-python>=0.2.0,<1.0.0
 # ORCHESTRAZIONE AGENTI
 # Collega il tuo database Supabase (già configurato nel Core) 
 # alla logica di ragionamento dell'agente.
-langchain>=0.1.0,<1.0.0
+langchain>=0.1.0,<0.4.0
 
 # --- Framework Alternativi (Opzionali) ---
 # crewai      # Per coordinare più agenti specializzati.
@@ -23,3 +23,7 @@ numpy>=1.26.4,<2.1.0
 # SUPPORTO DATE (Consigliato per Supabase)
 # Spesso necessario per gestire correttamente i timestamp di Supabase in Python.
 python-dateutil>=2.0.0,<3.0.0
+
+# solo per non avere warning
+numba==61.0 
+
