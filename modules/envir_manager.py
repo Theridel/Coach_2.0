@@ -40,7 +40,7 @@ def get_env_context():
     # Centralizziamo qui la gestione dei path per evitare hard-coding nel notebook
     repo_local = root / "repo"          # Cartella dove viene clonato il Git
     target_modules = root / "modules"   # Cartella che ospita questo e altri moduli .py
-    # path_db = root / "agent_instructions.db" # Database SQLite principale (Memoria Agente)
+    # path_db = root / "agent_instructions.db"  Database SQLite principale (Memoria Agente)
 
     # --- ESPORTAZIONE CONTESTO ---
     # Creiamo un dizionario che fungerà da "singola fonte di verità" per il main
@@ -51,7 +51,7 @@ def get_env_context():
         "REPO_LOCAL": repo_local,  # Percorso locale del repository
         "TARGET_MODULES": target_modules, # Percorso dei moduli Python
                                    # DATABASE 1: SQLite (Locale)
-                                   # "PATH_DB_LOCAL": root / "agent_instructions.db",
+                                   # "PATH_DB_LOCAL": root 
         
                                    # DATABASE 2: Supabase (Remoto - Segnaposto per le chiavi)
                                    # "SB_URL": None,
