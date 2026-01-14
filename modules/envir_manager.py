@@ -50,7 +50,12 @@ def get_env_context():
         "BRANCH": branch,          # Nome del branch Git da utilizzare
         "REPO_LOCAL": repo_local,  # Percorso locale del repository
         "TARGET_MODULES": target_modules, # Percorso dei moduli Python
-        "PATH_DB": path_db         # Percorso del file database memoria
+                                   # DATABASE 1: SQLite (Locale)
+        "PATH_DB_LOCAL": root_path / "agent_instructions.db",
+        
+                                   # DATABASE 2: Supabase (Remoto - Segnaposto per le chiavi)
+        "SB_URL": None,
+        "SB_KEY": None 
     }
     
-    return context
+    return envir
