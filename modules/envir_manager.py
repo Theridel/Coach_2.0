@@ -51,7 +51,7 @@ def get_env_context():
         "REPO_LOCAL": repo_local,  # Percorso locale del repository
         "TARGET_MODULES": target_modules, # Percorso dei moduli Python
                                    # DATABASE 1: SQLite (Locale)
-                                   # "PATH_DB_LOCAL": root_path / "agent_instructions.db",
+                                   # "PATH_DB_LOCAL": root / "agent_instructions.db",
         
                                    # DATABASE 2: Supabase (Remoto - Segnaposto per le chiavi)
                                    # "SB_URL": None,
