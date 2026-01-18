@@ -29,3 +29,7 @@ python-dateutil>=2.0.0,<3.0.0
 # solo per non avere warning
 numba<=0.61.0 
 
+# INTERAZIONE CON HUGGING FACE
+# Necessario per scaricare i modelli dal tuo repo Theridel/Coach e gestire i Secret.
+huggingface-hub>=0.25.0,<1.0.0
+
