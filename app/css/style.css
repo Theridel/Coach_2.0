@@ -71,6 +71,27 @@ header h1, header p {
     transform: translateY(-2px); 
 }
 
+/* Stile per i pulsanti di navigazione secondari */
+.btn-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 0.9em;
+    transition: background-color 0.3s, opacity 0.2s;
+    margin: 10px 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-link:hover {
+    background-color: #004494; /* Un blu leggermente più scuro del primary */
+    color: white;
+    opacity: 0.9;
+}
+
 /* Media Query: Adattamento per schermi più grandi (Tablet/Desktop) */
 @media (min-width: 600px) {
     .container {
