@@ -1,38 +1,52 @@
 # cerchiamo di far colloquiare Vercel con Hugging Face
 
+// Usiamo https nativo di Node per massima compatibilità se fetch fallisce
+import https from 'https';
+
 export default async function handler(req, res) {
-  // Usiamo l'endpoint synchronous che è più adatto alle serverless functions
-  const HF_SPACE_URL = "https://theridel-orchestratore.hf.space/run/predict";
+  const hostname = 'theridel-orchestratore.hf.space';
+  const path = '/run/predict';
 
-  try {
-    const response = await fetch(HF_SPACE_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        data: ["Test connessione"]
-      })
+  const data = JSON.stringify({
+    data: ["Test di connessione"]
+  });
+
+  const options = {
+    hostname: hostname,
+    port: 443,
+    path: path,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': data.length
+    },
+    timeout: 8000 // 8 secondi per non far crashare Vercel
+  };
+
+  return new Promise((resolve) => {
+    const request = https.request(options, (response) => {
+      let body = '';
+      response.on('data', (chunk) => body += chunk);
+      response.on('end', () => {
+        try {
+          const jsonResponse = JSON.parse(body);
+          res.status(200).json({
+            stato: "Successo",
+            risposta_hf: jsonResponse.data ? jsonResponse.data[0] : "Nessun dato"
+          });
+        } catch (e) {
+          res.status(500).json({ errore: "Errore parsing HF", dettaglio: body });
+        }
+        resolve();
+      });
     });
 
-    // Se Hugging Face risponde con errore, lo catturiamo qui
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`HF Space Error: ${response.status} - ${errorData}`);
-    }
-
-    const result = await response.json();
-    
-    // Gradio /run/predict restituisce i dati direttamente in result.data
-    res.status(200).json({
-      stato: "Successo!",
-      risposta_ai: result.data[0],
-      info: "Vercel ha parlato con Hugging Face e ha ricevuto risposta."
+    request.on('error', (error) => {
+      res.status(500).json({ errore: "Errore richiesta HTTPS", messaggio: error.message });
+      resolve();
     });
 
-  } catch (error) {
-    // Questo ci aiuterà a capire esattamente cosa fallisce nei log di Vercel
-    res.status(500).json({ 
-      errore: "Fallimento nel tunnel Vercel -> HF",
-      messaggio: error.message 
-    });
-  }
+    request.write(data);
+    request.end();
+  });
 }
