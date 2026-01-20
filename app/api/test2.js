@@ -1,61 +1,44 @@
 # cerchiamo di far colloquiare Vercel con Hugging Face
 
-import https from 'https';
-
 export default async function handler(req, res) {
-  // L'host deve essere esattamente questo
-  const hostname = 'theridel-orchestratore.hf.space';
-  
-  // Gradio usa questo percorso per le chiamate API dirette (senza client libreria)
-  const path = '/api/api_handler'; 
-
-  // Formato dati richiesto dal tuo Space (vedi screenshot HF)
-  const requestPayload = JSON.stringify({
-    data: ["Hello!!"] // Gradio via HTTP vuole comunque i dati dentro un array 'data'
-  });
+  // L'endpoint per le chiamate dirette sincrone basato sul tuo screenshot
+  const HF_URL = "https://theridel-orchestratore.hf.space/run/api_handler";
 
   try {
-    return new Promise((resolve) => {
-      const options = {
-        hostname: hostname,
-        port: 443,
-        path: path,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(requestPayload)
-        },
-        timeout: 10000
-      };
-
-      const request = https.request(options, (response) => {
-        let body = '';
-        response.on('data', (chunk) => body += chunk);
-        response.on('end', () => {
-          try {
-            const jsonResponse = JSON.parse(body);
-            // Mandiamo al browser la risposta pulita
-            res.status(200).json({
-              successo: true,
-              risposta_ai: jsonResponse.data ? jsonResponse.data[0] : "Nessun testo ricevuto",
-              debug: jsonResponse
-            });
-          } catch (e) {
-            res.status(200).json({ errore: "Risposta non JSON", raw: body });
-          }
-          resolve();
-        });
-      });
-
-      request.on('error', (err) => {
-        res.status(200).json({ errore: "Errore connessione", msg: err.message });
-        resolve();
-      });
-
-      request.write(requestPayload);
-      request.end();
+    // Usiamo fetch che è più leggibile e moderno di https.request
+    const response = await fetch(HF_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        data: ["Ciao da Vercel!"] // Il parametro 'input_data' va qui dentro
+      })
     });
-  } catch (err) {
-    res.status(200).json({ errore: "Eccezione", msg: err.message });
+
+    // Se lo Space è in coda o ha problemi, response.ok sarà false
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(200).json({
+        successo: false,
+        errore: `Lo Space ha risposto con errore ${response.status}`,
+        dettaglio: errorText
+      });
+    }
+
+    const result = await response.json();
+
+    // Gradio restituisce i dati in un array dentro la chiave 'data'
+    return res.status(200).json({
+      successo: true,
+      risposta_ai: result.data ? result.data[0] : "Nessuna risposta nel pacchetto",
+      debug: result
+    });
+
+  } catch (error) {
+    // Questo cattura errori di rete o crash del codice
+    return res.status(200).json({
+      successo: false,
+      errore: "Eccezione durante la chiamata",
+      messaggio: error.message
+    });
   }
 }
