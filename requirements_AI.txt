@@ -1,0 +1,36 @@
+# ==========================================================
+# REQUISITI AI & AGENT (SageMaker / Colab / HF Spaces)
+# ==========================================
+
+# ESECUZIONE MODELLI LOCALI
+# Permette di far girare i modelli GGUF (Llama, Mistral) direttamente
+# sulla CPU/GPU di SageMaker o Colab senza passare per API esterne.
+llama-cpp-python>=0.2.0,<1.0.0
+
+# ORCHESTRAZIONE AGENTI
+# Collega il tuo database Supabase (già configurato nel Core) 
+# alla logica di ragionamento dell'agente.
+langchain-core>=0.3.0,<0.4.0; python_version >= "3.9" and python_version < "3.11"
+langchain-core>=0.3.0,<0.9.0; python_version >= "3.11" and python_version <= "3.14"
+langgraph>=0.2.0,<2.0.0
+langchain>=0.2.0,<0.4.0
+
+# --- Framework Alternativi (Opzionali) ---
+# crewai      # Per coordinare più agenti specializzati.
+# autogen     # Per conversazioni autonome tra agenti.
+
+# CALCOLO MATEMATICO & VETTORIALE
+# Fondamentale per la gestione degli embeddings (la memoria semantica dell'AI).
+numpy>=1.26.4,<2.1.0
+
+# SUPPORTO DATE (Consigliato per Supabase)
+# Spesso necessario per gestire correttamente i timestamp di Supabase in Python.
+python-dateutil>=2.0.0,<3.0.0
+
+# solo per non avere warning
+numba<=0.61.0 
+
+# INTERAZIONE CON HUGGING FACE
+# Necessario per scaricare i modelli dal tuo repo Theridel/Coach e gestire i Secret.
+huggingface-hub>=0.25.0,<1.0.0
+
