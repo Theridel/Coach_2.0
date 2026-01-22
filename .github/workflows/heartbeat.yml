@@ -5,7 +5,7 @@ on:
   schedule:
     # Configurazione Cron: 'minuto ora giorno mese giorno_settimana'
     # '*' significa 'ogni'. Quindi '* * * * *' è ogni minuto, ogni ora, ogni giorno.
-    - cron: '* * * * *'
+    - cron: '*/5 * * * *'
   
   # Questo ci permette di avviare lo script manualmente con un click per il primo test
   workflow_dispatch:
@@ -46,5 +46,4 @@ jobs:
           # Creiamo il commit con la data corrente per riconoscerlo nella cronologia
           git commit -m "Heartbeat automatico: $(date '+%H:%M:%S')"
           
-          # Spingiamo il commit sul branch 'sviluppo'
           git push origin sviluppo
