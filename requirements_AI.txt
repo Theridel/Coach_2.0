@@ -10,7 +10,8 @@ llama-cpp-python>=0.2.0,<1.0.0
 # ORCHESTRAZIONE AGENTI
 # Collega il tuo database Supabase (già configurato nel Core) 
 # alla logica di ragionamento dell'agente.
-langchain-core>=0.3.0
+langchain-core>=0.3.0,<0.4.0; python_version >= "3.9" and python_version < "3.11"
+langchain-core>=0.3.0,<0.9.0; python_version >= "3.11" and python_version <= "3.14"
 langgraph>=0.2.0,<2.0.0
 langchain>=0.2.0,<0.4.0
 
