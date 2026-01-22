@@ -1,0 +1,50 @@
+# Nome del processo visualizzato nella tab "Actions" di GitHub
+name: Heartbeat PoC - Test Branch Sviluppo
+
+on:
+  schedule:
+    # Configurazione Cron: 'minuto ora giorno mese giorno_settimana'
+    # '*' significa 'ogni'. Quindi '* * * * *' è ogni minuto, ogni ora, ogni giorno.
+    - cron: '* * * * *'
+  
+  # Questo ci permette di avviare lo script manualmente con un click per il primo test
+  workflow_dispatch:
+
+jobs:
+  heartbeat_job:
+    # Utilizziamo l'ultima versione di Ubuntu messa a disposizione da GitHub
+    runs-on: ubuntu-latest
+    
+    # Permessi necessari per permettere alla "macchina" di scrivere file nel repository
+    permissions:
+      contents: write
+
+    steps:
+      # 1. Scarica il codice dal repository sulla macchina virtuale
+      - name: Clonazione Repository
+        uses: actions/checkout@v4
+        with:
+          # Specifichiamo di lavorare sul branch 'sviluppo'
+          ref: sviluppo
+
+      # 2. Esecuzione del comando shell per scrivere nel file
+      - name: Scrittura Log
+        run: |
+          # 'date' genera la stringa temporale. '>>' appende il testo in fondo al file (non sovrascrive)
+          echo "$(date '+%Y-%m-%d %H:%M:%S') - tutto ok (PoC)" >> heartbeat.log
+
+      # 3. Configurazione dell'utente Git e invio delle modifiche
+      - name: Push delle modifiche
+        run: |
+          # GitHub non sa chi sei "di persona", quindi usiamo l'identità del bot standard
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Aggiungiamo il file modificato all'area di stage
+          git add heartbeat.log
+          
+          # Creiamo il commit con la data corrente per riconoscerlo nella cronologia
+          git commit -m "Heartbeat automatico: $(date '+%H:%M:%S')"
+          
+          # Spingiamo il commit sul branch 'sviluppo'
+          git push origin sviluppo
