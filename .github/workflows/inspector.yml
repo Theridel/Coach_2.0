@@ -19,7 +19,7 @@ jobs:
       - name: Clonazione Repository
         uses: actions/checkout@v4
         with:
-          ref: main [cite: 2026-01-21]
+          ref: sviluppo
 
       - name: Verifica Heartbeat Vercel
         run: |
@@ -48,5 +48,5 @@ jobs:
           # Il flag --allow-empty impedisce l'errore "nothing to commit"
           git commit --allow-empty -m "Inspector Update: $(date '+%H:%M:%S')"
           
-          # Inviamo solo al branch main dopo il merge [cite: 2026-01-21]
-          git push origin main
+          # Inviamo solo al branch sviluppo dopo il merge 
+          git push origin sviluppo
