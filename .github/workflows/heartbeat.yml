@@ -4,7 +4,7 @@ name: Heartbeat PoC - Monitoraggio Vercel
 on:
   schedule:
     # Esecuzione ogni 5 minuti [cite: 2026-01-21]
-    - cron: '*/5 * * * *'
+    - cron: '*/10 * * * *'
   
   # Permette l'avvio manuale per i test
   workflow_dispatch:
@@ -30,7 +30,7 @@ jobs:
       - name: Verifica Heartbeat Vercel
         run: |
           # URL del tuo progetto su Vercel [cite: 2025-12-20]
-          URL="https://tuo-progetto.vercel.app"
+          URL="https://coach-2-0-git-sviluppo-theridels-projects.vercel.app/"
           
           echo "Verifica connessione a: $URL"
           
