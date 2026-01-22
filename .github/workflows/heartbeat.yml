@@ -1,0 +1,64 @@
+# Nome del processo visualizzato nella tab "Actions" di GitHub
+name: Heartbeat PoC - Monitoraggio Vercel
+
+on:
+  schedule:
+    # Esecuzione ogni 5 minuti [cite: 2026-01-21]
+    - cron: '*/5 * * * *'
+  
+  # Permette l'avvio manuale per i test
+  workflow_dispatch:
+
+jobs:
+  heartbeat_job:
+    runs-on: ubuntu-latest
+    
+    # Permessi di scrittura per aggiornare il log nel repository [cite: 2026-01-21]
+    permissions:
+      contents: write
+
+    steps:
+      # 1. Clonazione del codice
+      - name: Clonazione Repository
+        uses: actions/checkout@v4
+        with:
+          # Visto che hai fatto il merge, qui puntiamo a 'main' [cite: 2026-01-21]
+          # Se vuoi testare ancora su sviluppo, cambia 'main' in 'sviluppo'
+          ref: main
+
+      # 2. Verifica Heartbeat Vercel e scrittura log
+      - name: Verifica Heartbeat Vercel
+        run: |
+          # URL del tuo progetto su Vercel [cite: 2025-12-20]
+          URL="https://tuo-progetto.vercel.app"
+          
+          echo "Verifica connessione a: $URL"
+          
+          # Ping HTTP: otteniamo il codice di stato [cite: 2025-12-20]
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}" $URL)
+          
+          if [ $STATUS -eq 200 ]; then
+            echo "$(date '+%Y-%m-%d %H:%M:%S') - Vercel Online (Status: $STATUS)" >> heartbeat.log
+          else
+            echo "$(date '+%Y-%m-%d %H:%M:%S') - ERRORE Vercel (Status: $STATUS)" >> heartbeat.log
+          fi
+
+      # 3. Push dei risultati sul repository
+      - name: Push delle modifiche
+        # if: always() assicura che il log venga salvato anche se il sito è offline
+        if: always()
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add -f heartbeat.log
+          
+          # --allow-empty evita che il processo fallisca se non ci sono modifiche al file
+          git commit --allow-empty -m "Heartbeat automatico: $(date '+%H:%M:%S')"
+          
+          # Carica i cambiamenti sul branch principale [cite: 2026-01-21]
+          git push origin main
+          # Creiamo il commit con la data corrente per riconoscerlo nella cronologia
+          git commit -m "Heartbeat automatico: $(date '+%H:%M:%S')"
+          
+          git push origin sviluppo
