@@ -41,7 +41,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           # Aggiungiamo il file modificato all'area di stage
-          git add heartbeat.log
+          git add -f heartbeat.log
           
           # Creiamo il commit con la data corrente per riconoscerlo nella cronologia
           git commit -m "Heartbeat automatico: $(date '+%H:%M:%S')"
