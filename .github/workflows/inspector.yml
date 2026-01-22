@@ -1,10 +1,10 @@
 # Nome del processo visualizzato nella tab "Actions" di GitHub
-name: Heartbeat PoC - Monitoraggio Vercel
+name: Inspector PoC - Monitoraggio Vercel et al.
 
 on:
   schedule:
     # Esecuzione ogni 5 minuti [cite: 2026-01-21]
-    - cron: '*/10 * * * *'
+    - cron: '*/6 * * * *'
   
   # Permette l'avvio manuale per i test
   workflow_dispatch:
