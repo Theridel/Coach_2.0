@@ -1,9 +1,8 @@
-
-name: Inspector - Monitoraggio sito (ogni 6 minuti)
+name: Inspector - Monitoraggio sito (artifact)
 
 on:
   schedule:
-    - cron: "*/6 * * * *"   # ogni 6 minuti (UTC)
+    - cron: "*/7 * * * *"   # ogni 6 minuti (UTC) - evita sovrapposizione con altri cron
   workflow_dispatch:
 
 concurrency:
@@ -16,32 +15,47 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Verifica sito (con curl robusto)
+      - name: Verifica sito con curl (robusto) e prepara log
         env:
           URL: "https://coach-2-0-git-sviluppo-theridels-projects.vercel.app/"
         run: |
           set -euo pipefail
+          mkdir -p logs
+
           echo "Verifica connessione a: $URL"
 
-          # Usiamo curl in modo robusto:
+          # curl robusto:
           # -sS: silent ma mostra errori
           # -o /dev/null: scarta il body
           # -w "%{http_code}": stampa solo lo status code
           # -L: segue redirect (301/308)
-          # --max-time e --connect-timeout: timeout ragionevoli
-          # --retry: 3 tentativi con backoff
+          # timeout e retry per resilienza
           STATUS=$(curl -sS -o /dev/null -w "%{http_code}" -L \
                     --max-time 20 --connect-timeout 5 \
                     --retry 3 --retry-connrefused --retry-delay 3 \
                     "$URL" || echo "000")
 
-          echo "HTTP status: $STATUS"
-
-          # Consideriamo OK sia 2xx che 3xx
+          TS="$(date -u '+%Y-%m-%d %H:%M:%S') UTC"
           if [[ "$STATUS" =~ ^2[0-9]{2}$ || "$STATUS" =~ ^3[0-9]{2}$ ]]; then
-            echo "OK: sito raggiungibile (status $STATUS)"
-            exit 0
+            LINE="$TS - OK: $URL (Status $STATUS)"
+            echo "$LINE"
+            echo "$LINE" >> logs/inspector.log
           else
-            echo "FAIL: sito NON raggiungibile (status $STATUS)"
-            exit 1
+            LINE="$TS - FAIL: $URL (Status $STATUS)"
+            echo "$LINE"
+            echo "$LINE" >> logs/inspector.log
+            # Se preferisci NON fallire il job per continuare la serie, commenta la riga seguente:
+            # exit 1
           fi
+
+          # Rotazione semplice (ultime 1000 righe)
+          tail -n 1000 logs/inspector.log > logs/.tmp && mv logs/.tmp logs/inspector.log
+
+      - name: Carica artifact (log inspector)
+        uses: actions/upload-artifact@v4
+        with:
+          # Nome con numero di run e tentativo, così ogni run ha il suo pacchetto
+          name: inspector-log-${{ github.run_number }}-${{ github.run_attempt }}
+          path: logs/inspector.log
+          retention-days: 7
+          if-no-files-found: warn
