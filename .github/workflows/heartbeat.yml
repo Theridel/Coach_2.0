@@ -1,16 +1,34 @@
-# Nome del processo visualizzato nella tab "Actions" di GitHub
 
 name: Heartbeat - Test ogni 10 minuti
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # Ogni 10 minuti (UTC)
+    - cron: "*/10 * * * *"   # ogni 10 minuti (UTC)
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   heartbeat:
     runs-on: ubuntu-22.04
+    timeout-minutes: 5
+
     steps:
-      - name: Heartbeat Log
+      - name: Heartbeat Log (stdout)
         run: |
           echo "Heartbeat OK - $(date -u '+%Y-%m-%d %H:%M:%S') UTC"
+
+      - name: Prepara file di log (opzionale, per debug)
+        run: |
+          mkdir -p logs
+          echo "Heartbeat OK - $(date -u '+%Y-%m-%d %H:%M:%S') UTC" > logs/heartbeat.txt
+
+      - name: Carica artifact (opzionale)
+        uses: actions/upload-artifact@v4
+        with:
+          name: heartbeat-${{ github.run_number }}-${{ github.run_attempt }}
+          path: logs/heartbeat.txt
+          retention-days: 3
+``
