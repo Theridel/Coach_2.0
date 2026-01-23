@@ -1,0 +1,47 @@
+
+name: Inspector - Monitoraggio sito (ogni 6 minuti)
+
+on:
+  schedule:
+    - cron: "*/6 * * * *"   # ogni 6 minuti (UTC)
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  inspector_job:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Verifica sito (con curl robusto)
+        env:
+          URL: "https://coach-2-0-git-sviluppo-theridels-projects.vercel.app/"
+        run: |
+          set -euo pipefail
+          echo "Verifica connessione a: $URL"
+
+          # Usiamo curl in modo robusto:
+          # -sS: silent ma mostra errori
+          # -o /dev/null: scarta il body
+          # -w "%{http_code}": stampa solo lo status code
+          # -L: segue redirect (301/308)
+          # --max-time e --connect-timeout: timeout ragionevoli
+          # --retry: 3 tentativi con backoff
+          STATUS=$(curl -sS -o /dev/null -w "%{http_code}" -L \
+                    --max-time 20 --connect-timeout 5 \
+                    --retry 3 --retry-connrefused --retry-delay 3 \
+                    "$URL" || echo "000")
+
+          echo "HTTP status: $STATUS"
+
+          # Consideriamo OK sia 2xx che 3xx
+          if [[ "$STATUS" =~ ^2[0-9]{2}$ || "$STATUS" =~ ^3[0-9]{2}$ ]]; then
+            echo "OK: sito raggiungibile (status $STATUS)"
+            exit 0
+          else
+            echo "FAIL: sito NON raggiungibile (status $STATUS)"
+            exit 1
+          fi
