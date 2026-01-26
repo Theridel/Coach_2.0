@@ -11,51 +11,50 @@ from pathlib import Path
 
 def get_env_context():
     """
-    Esegue lo screening del file system per determinare dove si trova l'agente.
-    Restituisce un dizionario (dict) con i metadati dell'ambiente.
-    """
-    
+     Restituisce un dizionario (dict) con i metadati dell'ambiente.
+    """       
     # --- RILEVAZIONE AMBIENTE ---
-    # Cerchiamo directory specifiche che esistono solo in determinati cloud provider
     if Path("/content").exists():
-        # Ambiente Google Colab standard
         env = "COLAB"
         root = Path("/content")
-        branch = "sviluppo"  # Branch di lavoro predefinito per Colab
+        branch = "sviluppo"
         
     elif Path("/home/studio-lab-user").exists():
-        # Ambiente Amazon SageMaker Studio Lab
         env = "SAGEMAKER"
         root = Path("/home/studio-lab-user")
-        # In SageMaker forziamo sviluppo fino a collaudo definitivo del main
         branch = "sviluppo" 
         
+    elif os.getenv("GITHUB_ACTIONS"): # <--- NUOVO CONTROLLO PER IL COLLAUDO
+        env = "GITHUB_ACTION"
+        root = Path.cwd()
+        # Recuperiamo il branch attuale direttamente da GitHub
+        branch = os.getenv("GITHUB_REF_NAME", "sviluppo")
+        
     else:
-        # Fallback per esecuzione locale o ambienti ignoti
-        env = "UNKNOWN"
-        root = Path(os.getcwd())
+        env = "LOCAL"
+        root = Path.cwd()
         branch = "main"
 
-    # --- DEFINIZIONE PERCORSI DERIVATI ---
-    # Centralizziamo qui la gestione dei path per evitare hard-coding nel notebook
-    repo_local = root / "repo"          # Cartella dove viene clonato il Git
-    target_modules = root / "modules"   # Cartella che ospita questo e altri moduli .py
+    # --- DEFINIZIONE PERCORSI ---
+    # In GitHub Action, il repo è già nella root, quindi repo_local coincide con root
+    repo_local = root if env == "GITHUB_ACTION" else root / "repo"
+    target_modules = root / "modules"
     # path_db = root / "agent_instructions.db"  Database SQLite principale (Memoria Agente)
-
+       
     # --- ESPORTAZIONE CONTESTO ---
     # Creiamo un dizionario che fungerà da "singola fonte di verità" per il main
     context = {
-        "ENV": env,                # Stringa identificativa (COLAB/SAGEMAKER)
-        "ROOT": root,              # Path oggetto della directory radice
-        "BRANCH": branch,          # Nome del branch Git da utilizzare
-        "REPO_LOCAL": repo_local,  # Percorso locale del repository
-        "TARGET_MODULES": target_modules, # Percorso dei moduli Python
+        "ENV": env,
+        "ROOT": root,
+        "BRANCH": branch,
+        "REPO_LOCAL": repo_local,
+        "TARGET_MODULES": target_modules,
                                    # DATABASE 1: SQLite (Locale)
                                    # "PATH_DB_LOCAL": root 
         
                                    # DATABASE 2: Supabase (Remoto - Segnaposto per le chiavi)
                                    # "SB_URL": None,
-                                   # "SB_KEY": None 
+                                   # "SB_KEY": None    
     }
     
     return context
