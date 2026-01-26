@@ -2,7 +2,7 @@ name: Inspector - Monitoraggio sito (artifact)
 
 on:
   schedule:
-    - cron: "*/7 * * * *"   # ogni 6 minuti (UTC) - evita sovrapposizione con altri cron
+    - cron: "8 8 * * *"   # ogni giorno - evita sovrapposizione con altri cron
   workflow_dispatch:
 
 concurrency:
