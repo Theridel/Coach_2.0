@@ -1,6 +1,7 @@
 {
   "name": "mio-progetto-supabase-vercel",
   "version": "1.0.0",
+  "type": "module"
   "description": "App static + API Supabase su Vercel",
   "scripts": {
     "dev": "servor --reload",
