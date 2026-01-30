@@ -10,6 +10,6 @@ Progetto per Agent AI usando Gemma su colab
 
 ## 🎯 Obiettivo
 
-Costruire un **Agent AI modulare** e **riproducibile** che:
+Costruire un **Agent AI modulare** e **riproducibile** che sia flessibile e potente:
 
 # La parte sottostante è da verificare
