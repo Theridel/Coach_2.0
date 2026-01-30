@@ -7,7 +7,6 @@ La cosa più importamte sarà non perdersi.
 # Personal-AI-Agent-for-coach
 Progetto per Agent AI usando Gemma su colab
 
-[![Sviluppo Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Theridel/Coach_2.0/blob/sviluppo/Launcher_AI.ipynb)
 
 ## 🎯 Obiettivo
 
