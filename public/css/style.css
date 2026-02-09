@@ -38,13 +38,43 @@ header h1, header p {
     color: white;
 }
 
-/* Griglia per i link (Launchpad Cards) */
-.grid {
-    display: flex;
-    flex-direction: column; /* I link uno sotto l'altro su mobile (priorità) */
-    align-items: center; 
-    gap: 15px;
-    margin-top: 20px;
+/* Layout del Launchpad con CSS Grid Unificato */
+.container-pulsanti {
+  display: grid;
+  grid-template-columns: 1fr; /* Default mobile: 1 colonna */
+  gap: 15px;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+/* Modifica la tua classe .link-card esistente aggiungendo larghezza automatica */
+.link-card {
+  display: block;
+  padding: 18px 25px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--primary-color);
+  background-color: var(--secondary-color);
+  font-weight: bold;
+  font-size: 1.1em;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  width: auto; /* Lasciamo che Grid decida la larghezza */
+}
+
+/* Aggiorna la tua Media Query esistente */
+@media (min-width: 600px) {
+  .container {
+    margin-top: 40px;
+    width: 90%;
+  }
+  
+  .container-pulsanti {
+    grid-template-columns: 1fr 1fr; /* Sopra i 600px: 2 colonne */
+    max-width: 800px;
+  }
 }
 
 /* Link Card */
@@ -119,26 +149,4 @@ footer {
     border-top: 1px solid #dee2e6;
     padding-left: 10px; /* ✅ aggiunto */
     padding-right: 10px; /* ✅ aggiunto */
-}
-
-/* Layout pulsanti Launchpad */
-.container-pulsanti {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* due colonne */
-  gap: 10px;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.container-pulsanti button {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-}
-
-/* Responsive: su schermi piccoli torna a una colonna */
-@media (max-width: 600px) {
-  .container-pulsanti {
-    grid-template-columns: 1fr; /* una colonna */
-  }
 }
